@@ -1,0 +1,61 @@
+﻿Version=2.18
+AppType=StandardJava
+IconFile=
+NumberOfModules=1
+Module1=Tools
+Build1=Default,b4j.example
+NumberOfFiles=0
+NumberOfLibraries=3
+Library1=jcore
+Library2=jstringfunctions
+Library3=jstringutils
+@EndOfDesignText@
+'Non-UI application (console / server application)
+#Region  Project Attributes 
+	#CommandLineArgs: data/*.vcf
+	#MergeLibraries: True 
+#End Region
+
+Sub Process_Globals
+	Public cardMap As Map
+	cardMap.Initialize	
+End Sub
+
+
+Sub AppStart (Args() As String)
+	'take file from command line
+	'split into separate .vcf files
+	
+	If Args.Length = 0 Then
+		Log("Syntax:" & Chr(10) & Chr(9) & "VCardSplitter filename.vcf")
+		Return 
+	End If
+	
+	'StartMessageLoop 
+	
+	Dim i As Int
+	
+	If Args.Length > 0 Then
+		For i = 0 To Args.Length - 1
+			Tools.Process( Args(i))
+		Next
+	End If
+	
+
+	For Each key As String In cardMap.keys
+	    Log(cardMap.Get(key))
+		If cardMap.Get(key) <> Null Then 
+			Dim fname As String = key & ".vcf"
+			fname = fname.Replace("?","_")
+			fname = fname.Replace("/","_")
+			'File.WriteString("",fname,Cards.Get(k))
+			Dim temp As String = "BEGIN:VCARD" & CRLF
+			Dim tempCard As Map = cardMap.Get(key)
+			For Each yek As String In tempCard.Keys
+				temp = temp & yek & tempCard.Get(yek) & CRLF
+			Next
+			temp = temp & "END:VCARD" & CRLF
+			File.WriteString("",fname,temp)
+		End If
+	Next
+End Sub
